@@ -1,0 +1,3 @@
+[submodule "gazebo-ogre-rendering-utils"]
+	path = gazebo-ogre-rendering-utils
+	url = git@github.com:svenlr/gazebo-ogre-rendering-utils.git

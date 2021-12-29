@@ -1,6 +1,8 @@
 #include "HQScreenshot.h"
 
 #include <OGRE/OgreRoot.h>
+#include <gazebo/gui/gui.hh>
+#include <gazebo/rendering/UserCamera.hh>
 #include <OGRE/OgreSceneManager.h>
 #include "png_utils.h"
 
@@ -84,8 +86,9 @@ void HQScreenshot::pre_render_callback() {
                     obj->setRenderQueueGroup(3);
                 }
             });
-            int w = client_camera->getViewport()->getActualWidth();
-            int h = client_camera->getViewport()->getActualHeight();
+            rendering::UserCameraPtr cam = gui::get_active_camera();
+            int w = cam->GetImageWidth() * 4;
+            int h = cam->GetImageHeight() * 4;
             rtt_img.initialize("hq_screenshot", client_camera, w, h);
         }
     } else { // scene_manager == nullptr

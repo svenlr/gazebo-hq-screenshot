@@ -68,11 +68,14 @@ void HQScreenshot::pre_render_callback() {
             std::cerr << "camera: " << ret.first << std::endl;
             client_camera = ret.second;
         }
-        if (client_camera and not rtt_img.rendering_texture) {
+        rendering::UserCameraPtr cam = gui::get_active_camera();
+        int w = cam->GetImageWidth() * 4;
+        int h = cam->GetImageHeight() * 4;
+        if (client_camera and
+            (not rtt_img.rendering_texture or w != rtt_img.width or h != rtt_img.height)) {
             client_camera->setRenderingMinPixelSize(0);
             client_camera->setUseRenderingDistance(false);
-            client_camera->setPolygonMode(Ogre::PolygonMode::PM_SOLID);
-            client_camera->setLodBias(2.0);
+//            client_camera->setLodBias(2.0);
             iterateSceneEntities([&](Ogre::Entity *obj) {
                 bool is_floor = false;
                 for (int k = 0; k < obj->getNumSubEntities(); ++k) {
@@ -86,9 +89,6 @@ void HQScreenshot::pre_render_callback() {
                     obj->setRenderQueueGroup(3);
                 }
             });
-            rendering::UserCameraPtr cam = gui::get_active_camera();
-            int w = cam->GetImageWidth() * 4;
-            int h = cam->GetImageHeight() * 4;
             rtt_img.initialize("hq_screenshot", client_camera, w, h);
         }
     } else { // scene_manager == nullptr

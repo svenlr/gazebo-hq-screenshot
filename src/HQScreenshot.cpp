@@ -84,8 +84,8 @@ void HQScreenshot::pre_render_callback() {
                     obj->setRenderQueueGroup(3);
                 }
             });
-            int w = client_camera->getViewport()->getActualWidth() * 4;
-            int h = client_camera->getViewport()->getActualHeight() * 4;
+            int w = client_camera->getViewport()->getActualWidth();
+            int h = client_camera->getViewport()->getActualHeight();
             rtt_img.initialize("hq_screenshot", client_camera, w, h);
         }
     } else { // scene_manager == nullptr

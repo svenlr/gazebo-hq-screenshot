@@ -12,10 +12,10 @@ GZ_REGISTER_GUI_PLUGIN(HQScreenshot)
 
 HQScreenshot::HQScreenshot()
         : GUIPlugin() {
-    QHBoxLayout *mainLayout = new QHBoxLayout;
-    QFrame *mainFrame = new QFrame();
-    QVBoxLayout *frameLayout = new QVBoxLayout();
-    QPushButton *button = new QPushButton(tr("HQ Screenshot"));
+    auto *mainLayout = new QHBoxLayout;
+    auto *mainFrame = new QFrame();
+    auto *frameLayout = new QVBoxLayout();
+    auto *button = new QPushButton(tr("HQ Screenshot"));
     connect(button, SIGNAL(clicked()), this, SLOT(button_callback()));
     frameLayout->addWidget(button);
     mainFrame->setLayout(frameLayout);
@@ -23,7 +23,7 @@ HQScreenshot::HQScreenshot()
     mainLayout->setContentsMargins(0, 0, 0, 0);
     frameLayout->setContentsMargins(0, 0, 0, 0);
 
-    this->setStyleSheet("QFrame { background-color : rgba(100, 100, 100, 255); color : white; }");
+    this->setStyleSheet("QFrame { background-color : rgba(100, 100, 100, 120); color : white; }");
     this->setLayout(mainLayout);
     this->move(5, 5);
     this->resize(130, 40);
@@ -32,8 +32,7 @@ HQScreenshot::HQScreenshot()
             boost::bind(&HQScreenshot::pre_render_callback, this));
 }
 
-HQScreenshot::~HQScreenshot() {
-}
+HQScreenshot::~HQScreenshot() = default;
 
 void HQScreenshot::button_callback() {
     if (rtt_img.rendering_texture) {
@@ -80,21 +79,6 @@ void HQScreenshot::pre_render_callback() {
         }
     } else { // scene_manager == nullptr
         scene_manager = get_scene_manager();
-        if (scene_manager) {
-            iterateSceneEntities([&](Ogre::Entity *obj) {
-                bool is_floor = false;
-                for (int k = 0; k < obj->getNumSubEntities(); ++k) {
-                    auto sub_entity = obj->getSubEntity(k);
-                    const auto &mat = sub_entity->getMaterial();
-                    if (mat->getName().find("Surface") != std::string::npos) {
-                        is_floor = true;
-                    }
-                }
-                if (not is_floor) {
-                    obj->setRenderQueueGroup(3);
-                }
-            });
-        }
     }
 }
 
@@ -109,35 +93,4 @@ Ogre::SceneManager *HQScreenshot::get_scene_manager() {
     } else {
         return nullptr;
     }
-}
-
-void HQScreenshot::iterateSceneEntities(std::function<void(Ogre::Entity *)> &&func) {
-    iterateSceneRecursively(
-            scene_manager->getRootSceneNode(), [&, this](Ogre::SceneNode *node, int level) {
-                auto it = node->getAttachedObjectIterator();
-                while (it.hasMoreElements()) {
-                    auto obj = dynamic_cast<Ogre::Entity *>(it.peekNextValue());
-                    if (obj) {
-                        func(obj);
-                    }
-                    it.moveNext();
-                }
-            });
-}
-
-void HQScreenshot::_iterateSceneRecursively(Ogre::SceneNode *root, std::function<void(Ogre::SceneNode *, int)> &func,
-                                            int level) {
-    func(root, level);
-    auto it = root->getChildIterator();
-    while (it.hasMoreElements()) {
-        auto node = dynamic_cast<Ogre::SceneNode *> (it.peekNextValue());
-        if (node) {
-            _iterateSceneRecursively(node, func, level + 1);
-        }
-        it.moveNext();
-    }
-}
-
-void HQScreenshot::iterateSceneRecursively(Ogre::SceneNode *root, std::function<void(Ogre::SceneNode *, int)> &&func) {
-    _iterateSceneRecursively(root, func, 0);
 }

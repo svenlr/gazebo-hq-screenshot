@@ -8,10 +8,6 @@
 
 #include "RenderToTexture.h"
 
-#ifndef Q_MOC_RUN
-
-
-#endif
 
 namespace Ogre {
     class Camera;
@@ -38,18 +34,21 @@ namespace gazebo {
         boost::shared_ptr<gazebo::event::Connection> m_render_subscription;
 
     private:
+        /**
+         * called each time before a render update in Gazebo
+         */
         void pre_render_callback();
 
+        /**
+         * Find a pointer to camera by (partial) name.
+         * Returns the first camera that contains the given string in its name.
+         */
         std::pair<std::string, Ogre::Camera *> search_camera(const std::string &camera_name);
 
+        /**
+         * get the scene manager singleton instance
+         */
         Ogre::SceneManager *get_scene_manager();
-
-        void iterateSceneEntities(std::function<void(Ogre::Entity *)> &&func);
-
-        void
-        _iterateSceneRecursively(Ogre::SceneNode *root, std::function<void(Ogre::SceneNode *, int)> &func, int level);
-
-        void iterateSceneRecursively(Ogre::SceneNode *root, std::function<void(Ogre::SceneNode *, int)> &&func);
 
     };
 }
